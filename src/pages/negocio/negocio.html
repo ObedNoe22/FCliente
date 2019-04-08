@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>{{nombre}}</ion-title>
+    <ion-buttons start>
+      <button ion-button icon-only color="royal" (click)="calificar()">
+        Calificar
+        <ion-icon name="checkmark-circle"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+  <div padding-left padding-right class="segmento">
+    <ion-segment [(ngModel)]="seleccion">
+      <ion-segment-button value="menu" (click)="buscarM()">
+        Menú
+      </ion-segment-button>
+      <ion-segment-button value="promociones" (click)="buscarP()">
+        Promociones del día
+      </ion-segment-button>
+      <ion-segment-button value="cupones" (click)="cupones()">
+        Cupones
+      </ion-segment-button>
+      <ion-segment-button value="comentarios" (click)="verComentarios()">
+        Comentarios/Reseñas
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+</ion-header>
+<ion-content padding>
+  <ion-item [ngSwitch]="seleccion">
+    <ion-list *ngSwitchCase="'promociones'">
+      <ion-card *ngFor="let promocion of promos">
+        <ion-item *ngIf="promocion.disponible==1">
+          {{promocion.descripcion}}
+        </ion-item>
+      </ion-card>
+    </ion-list>
+    <ion-list *ngSwitchCase="'menu'">
+      <ion-card *ngFor="let platillo of menu">
+        <ion-item *ngIf="platillo.disponible==1">
+          Platillo: {{platillo.nombre}}
+          Costo: {{platillo.costo}}
+        </ion-item>
+      </ion-card>
+    </ion-list>
+    <ion-list *ngSwitchCase="'cupones'">
+      <ion-card *ngFor="let cupon of cuponesT">
+        <ion-item *ngIf="cupon.activo==1">
+          Tipo de cupon: {{cupon.tipo}}
+          Descripcion: {{cupon.descripcion}}
+          <ion-item *ngIf="cupon.tipo=='codigo'">
+            Codigo: {{cupon.codigo}}
+          </ion-item>
+          <ion-item *ngIf="cupon.tipo=='fecha'">
+            Caducidad: {{cupon.caducidad}}
+          </ion-item>
+          <ion-item *ngIf="cupon.tipo=='usos'">
+            Usos disponibles: {{cupon.usos}}
+            Tocame para canjearme
+          </ion-item>
+        </ion-item>
+      </ion-card>
+    </ion-list>
+    <ion-list *ngSwitchCase="'comentarios'">
+      Puntuacion {{puntuacion}}
+      <ion-card *ngFor="let comentarioI of comentarios">
+        <ion-item *ngIf="comentarioI.id_usuario==miId" (click)="editarCom(comentarioI)">
+          Pulsame para editar tu comentario
+          <ion-item>
+            <div class="A" *ngFor="let i of [1,2,3,4,5]">
+              <input *ngIf="i<=comentarioI.puntuacion" type="image"
+                     src="https://imagensn.com/images/2016/08/05/icon-star-active.png">
+              <input *ngIf="i>comentarioI.puntuacion" type="image"
+                     src="https://imagensn.com/images/2016/08/05/icon-star-inactive.png">
+            </div>
+          </ion-item>
+          <ion-item>
+            {{comentarioI.comentario}}
+          </ion-item>
+        </ion-item>
+        <ion-item *ngIf="comentarioI.id_usuario!=miId">
+          <ion-item>
+            <div class="A" *ngFor="let i of [1,2,3,4,5]">
+              <input *ngIf="i<=comentarioI.puntuacion" type="image"
+                     src="https://imagensn.com/images/2016/08/05/icon-star-active.png" (click)="puntuar(i)">
+              <input *ngIf="i>comentarioI.puntuacion" type="image"
+                     src="https://imagensn.com/images/2016/08/05/icon-star-inactive.png" (click)="puntuar(i)">
+            </div>
+          </ion-item>
+          <ion-item>
+            {{comentarioI.comentario}}
+          </ion-item>
+        </ion-item>
+      </ion-card>
+    </ion-list>
+  </ion-item>
+</ion-content>
+

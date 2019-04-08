@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Promociones del dia</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list>
+    <ion-item *ngFor="let promocion of promociones">
+      <ion-card (click)="negocio(promocion.negocio.id)">
+        Negocio: {{promocion.negocio.nombre}}
+        <br>
+        Promocion: {{promocion.promocion.descripcion}}
+      </ion-card>
+    </ion-item>
+  </ion-list>
+</ion-content>

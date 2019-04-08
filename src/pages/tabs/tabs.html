@@ -1,0 +1,5 @@
+<ion-tabs [selectedIndex]="tabIndex">
+  <ion-tab tabIcon="person" tabTitle="Inicio" [root]="Inicio" tabsHideOnSubPages="true"></ion-tab>
+  <ion-tab tabIcon="person" tabTitle="Promociones globales" [root]="Promos" tabsHideOnSubPages="true"></ion-tab>
+  <ion-tab tabIcon="power" tabTitle="Cerrar sesion" (ionSelect)="cerrarSesion()" tabsHideOnSubPages="true"></ion-tab>
+</ion-tabs>

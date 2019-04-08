@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Inicio de sesión</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-label text-center class="textlogo">FoodLyx</ion-label>
+  <ion-list>
+    <ion-item class="nopadding">
+      <ion-label floating>Nombre de usuario:</ion-label>
+      <ion-input [(ngModel)]="usuario.nombre"></ion-input>
+    </ion-item>
+    <ion-item class="nopadding">
+      <ion-label floating>Contraseña:</ion-label>
+      <ion-input type="password" [(ngModel)]="usuario.password"></ion-input>
+    </ion-item>
+  </ion-list>
+  <button ion-button (click)="inicio()" class="boton">Iniciar sesión</button>
+  <div padding text-center>
+    <hr class="linea">
+    <h6 href="#" class="subtitulo">
+      ¿Es la primera vez que ingresa a la app?
+    </h6>
+    <a (click)="registro()" class="vinculo">Registrate aquí</a>
+  </div>
+</ion-content>

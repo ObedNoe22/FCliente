@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>{{nombre}}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+      <div class="A" *ngFor="let i of [1,2,3,4,5]">
+        <input *ngIf="i<=calificacion.puntuacion" type="image"
+               src="https://imagensn.com/images/2016/08/05/icon-star-active.png" (click)="puntuar(i)">
+        <input *ngIf="i>calificacion.puntuacion" type="image"
+               src="https://imagensn.com/images/2016/08/05/icon-star-inactive.png" (click)="puntuar(i)">
+      </div>
+    </ion-item>
+    <ion-item>
+      <ion-label>Comentario</ion-label>
+      <ion-textarea [(ngModel)]="calificacion.comentario">
+      </ion-textarea>
+    </ion-item>
+    <button ion-button (click)="calificar()">Calificar</button>
+    <button ion-button (click)="cerrar()">Cancelar</button>
+  </ion-list>
+</ion-content>
+
