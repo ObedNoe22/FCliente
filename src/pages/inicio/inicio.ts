@@ -27,7 +27,7 @@ export class InicioPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
               private loaderCtrl: LoadingController, private toastCtrl: ToastController,
-              private negocioProv: NegociosProvider, private geolocation: Geolocation, private negProv: NegociosProvider) {
+              private negocioProv: NegociosProvider, private geolocation: Geolocation) {
   }
 
   ionViewWillEnter() {
@@ -36,12 +36,11 @@ export class InicioPage {
       content: "Obteniendo ubicacion..."
     });
     loader.present();
-    let watch = this.geolocation.watchPosition();
-    loader.dismiss();
-    watch.subscribe((data) => {
+    this.geolocation.getCurrentPosition().then((data)=>{
       this.pos = {lat: data.coords.latitude, lng: data.coords.longitude};
       this.initMap();
     });
+    loader.dismiss();
   }
 
   initMap() {
@@ -55,7 +54,7 @@ export class InicioPage {
       loader.present();
       this.map = GoogleMaps.create(document.getElementById('map_canvas'), mapOptions);
       this.map.setCameraTarget(this.pos);
-      this.map.setCameraZoom(10);
+      this.map.setCameraZoom(15);
       this.map.addMarker({
         position: this.pos,
         title: "Aqui estas",
@@ -65,7 +64,7 @@ export class InicioPage {
     } else {
       this.map.clear();
       this.map.setCameraTarget(this.pos);
-      this.map.setCameraZoom(10);
+      this.map.setCameraZoom(15);
       this.map.addMarker({
         position: this.pos,
         title: "Aqui estas",
@@ -98,18 +97,30 @@ export class InicioPage {
   }
 
   marcadoresA() {
+    const loader = this.loaderCtrl.create({
+      content: "Cargando restaurants"
+    });
+    loader.present();
     for (let i=0;i<this.marcadores.length;i++){
       this.negocioProv.comentarios(this.marcadores[i][0][2]).subscribe((data) => {
         this.map.addMarker({
+          animation: 'DROP',
           position:this.marcadores[i][0][1],
           icon: 'blue',
-          draggable:true,
           title:this.marcadores[i][0][0],
-          snippet:"Direccion: "+this.marcadores[i][0][3]+"\nPuntuacion: "+ data.promedio,
-          clickeable:true
+          snippet:"Direccion: "+this.marcadores[i][0][3]+"\nPuntuacion: "+ Number(data.promedio.toFixed(2)),
+          clickeable:true,
+          muestra:1
         }).then((marcador:Marker)=>{
           marcador.on(GoogleMapsEvent.MARKER_CLICK).subscribe(()=>{
-            marcador.showInfoWindow();
+            let h=marcador.get("muestra");
+            if(h==1){
+              marcador.showInfoWindow();
+              marcador.set("muestra",0);
+            }else {
+              marcador.hideInfoWindow();
+              marcador.set("muestra",1);
+            }
           });
           marcador.on(GoogleMapsEvent.INFO_CLICK).subscribe(()=>{
             this.negocio(this.marcadores[i][0][2]);
@@ -117,6 +128,7 @@ export class InicioPage {
         });
       });
     }
+    loader.dismiss();
   }
 
   negocio(id) {
