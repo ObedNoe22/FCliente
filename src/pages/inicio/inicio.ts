@@ -2,7 +2,10 @@ import {Component} from '@angular/core';
 import {IonicPage, LoadingController, NavController, NavParams, ToastController} from 'ionic-angular';
 import {NegociosProvider} from "../../providers/negocios/negocios";
 import {NegocioPage} from "../negocio/negocio";
-import {GoogleMap, GoogleMapOptions, GoogleMaps, GoogleMapsMapTypeId} from "@ionic-native/google-maps";
+import {
+  GoogleMap, GoogleMapOptions, GoogleMaps, GoogleMapsEvent, GoogleMapsMapTypeId, HtmlInfoWindow,
+  Marker
+} from "@ionic-native/google-maps";
 import {Geolocation} from "@ionic-native/geolocation";
 
 /**
@@ -20,14 +23,15 @@ import {Geolocation} from "@ionic-native/geolocation";
 export class InicioPage {
   pos: any = 0;
   map: GoogleMap;
+  marcadores :any[][] =[];
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
               private loaderCtrl: LoadingController, private toastCtrl: ToastController,
-              private negocioProv: NegociosProvider, private geolocation: Geolocation) {
+              private negocioProv: NegociosProvider, private geolocation: Geolocation, private negProv: NegociosProvider) {
   }
 
   ionViewWillEnter() {
-    this.pos=0;
+    this.pos = 0;
     const loader = this.loaderCtrl.create({
       content: "Obteniendo ubicacion..."
     });
@@ -51,7 +55,7 @@ export class InicioPage {
       loader.present();
       this.map = GoogleMaps.create(document.getElementById('map_canvas'), mapOptions);
       this.map.setCameraTarget(this.pos);
-      this.map.setCameraZoom(18);
+      this.map.setCameraZoom(10);
       this.map.addMarker({
         position: this.pos,
         title: "Aqui estas",
@@ -61,7 +65,7 @@ export class InicioPage {
     } else {
       this.map.clear();
       this.map.setCameraTarget(this.pos);
-      this.map.setCameraZoom(18);
+      this.map.setCameraZoom(10);
       this.map.addMarker({
         position: this.pos,
         title: "Aqui estas",
@@ -72,13 +76,16 @@ export class InicioPage {
     loader.dismiss();
     this.negocioProv.todosNegoc().subscribe((result) => {
       if (result.estado) {
-        let tneg=result.negocios;
+        this.marcadores=[];
+        let tneg = result.negocios;
         for (let f = 0; f < tneg.length; f++) {
-          let coords={lat: tneg[f].latitud, lng: tneg[f].longitud};
-          let nombre=tneg[f].nombre;
-          this.marcadores(coords,nombre);
+          let nombre = tneg[f].nombre;
+          let coords={lat:tneg[f].latitud,lng:tneg[f].longitud};
+          let id=tneg[f].id;
+          let neg=[[nombre,coords,id]];
+          this.marcadores.push(neg);
         }
-        console.log(result);
+        this.marcadoresA();
       }
       else {
         this.toastCtrl.create({
@@ -88,14 +95,35 @@ export class InicioPage {
       }
     });
   }
-marcadores(cordenadas,nombre){
-  this.map.addMarker({
-    position: cordenadas,
-    title: nombre,
-    icon: 'blue',
-    animation: 'DROP',
-  });
-}
+
+  marcadoresA() {
+    this.map.addMarker({
+      position:this.marcadores[0][0][1],
+      icon: 'blue',
+      draggable:true,
+      title:"prueba1",
+      clickeable:true
+    }).then((marcador:Marker)=>{
+      marcador.on(GoogleMapsEvent.MARKER_CLICK).subscribe(()=>{
+        console.log("aa");
+      });
+    });
+    for (let i=0;i<this.marcadores.length;i++){
+      /*this.negocioProv.comentarios(this.marcadores[i][0][2]).subscribe((data) => {
+        let htmlInfo = new HtmlInfoWindow();
+        let frame: HTMLElement = document.createElement('div');
+        frame.innerHTML = [
+          '<h4>Negocio: ' + negocio.nombre + '</h4>',
+          '<span>Direccion: ' + negocio.direccion + '\nCalificacion: ' + data.promedio + '<a>\nVer restaurant</a></span>'
+        ].join("");
+        htmlInfo.setContent(frame, {width: "280", height: "120px"});*/
+      /*.then((marker:Marker)=>{
+        //htmlInfo.open(marker);
+        //marker.addListener
+      })*/
+    }
+  }
+
   negocio(id) {
     //TODO quitar al poner el mapa
     id = 13;
