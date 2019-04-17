@@ -3,7 +3,7 @@ import {IonicPage, LoadingController, NavController, NavParams, ToastController}
 import {NegociosProvider} from "../../providers/negocios/negocios";
 import {NegocioPage} from "../negocio/negocio";
 import {
-  GoogleMap, GoogleMapOptions, GoogleMaps, GoogleMapsEvent, GoogleMapsMapTypeId, HtmlInfoWindow,
+  GoogleMap, GoogleMapOptions, GoogleMaps, GoogleMapsEvent, GoogleMapsMapTypeId,
   Marker
 } from "@ionic-native/google-maps";
 import {Geolocation} from "@ionic-native/geolocation";
@@ -80,9 +80,10 @@ export class InicioPage {
         let tneg = result.negocios;
         for (let f = 0; f < tneg.length; f++) {
           let nombre = tneg[f].nombre;
+          let direccion=tneg[f].direccion;
           let coords={lat:tneg[f].latitud,lng:tneg[f].longitud};
           let id=tneg[f].id;
-          let neg=[[nombre,coords,id]];
+          let neg=[[nombre,coords,id,direccion]];
           this.marcadores.push(neg);
         }
         this.marcadoresA();
@@ -97,36 +98,28 @@ export class InicioPage {
   }
 
   marcadoresA() {
-    this.map.addMarker({
-      position:this.marcadores[0][0][1],
-      icon: 'blue',
-      draggable:true,
-      title:"prueba1",
-      clickeable:true
-    }).then((marcador:Marker)=>{
-      marcador.on(GoogleMapsEvent.MARKER_CLICK).subscribe(()=>{
-        console.log("aa");
-      });
-    });
     for (let i=0;i<this.marcadores.length;i++){
-      /*this.negocioProv.comentarios(this.marcadores[i][0][2]).subscribe((data) => {
-        let htmlInfo = new HtmlInfoWindow();
-        let frame: HTMLElement = document.createElement('div');
-        frame.innerHTML = [
-          '<h4>Negocio: ' + negocio.nombre + '</h4>',
-          '<span>Direccion: ' + negocio.direccion + '\nCalificacion: ' + data.promedio + '<a>\nVer restaurant</a></span>'
-        ].join("");
-        htmlInfo.setContent(frame, {width: "280", height: "120px"});*/
-      /*.then((marker:Marker)=>{
-        //htmlInfo.open(marker);
-        //marker.addListener
-      })*/
+      this.negocioProv.comentarios(this.marcadores[i][0][2]).subscribe((data) => {
+        this.map.addMarker({
+          position:this.marcadores[i][0][1],
+          icon: 'blue',
+          draggable:true,
+          title:this.marcadores[i][0][0],
+          snippet:"Direccion: "+this.marcadores[i][0][3]+"\nPuntuacion: "+ data.promedio,
+          clickeable:true
+        }).then((marcador:Marker)=>{
+          marcador.on(GoogleMapsEvent.MARKER_CLICK).subscribe(()=>{
+            marcador.showInfoWindow();
+          });
+          marcador.on(GoogleMapsEvent.INFO_CLICK).subscribe(()=>{
+            this.negocio(this.marcadores[i][0][2]);
+          })
+        });
+      });
     }
   }
 
   negocio(id) {
-    //TODO quitar al poner el mapa
-    id = 13;
     this.navCtrl.push(NegocioPage, {
       idNeg: id
     });
